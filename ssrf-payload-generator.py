@@ -361,7 +361,7 @@ def write_list_to_file(filename, list_input):
             [f.write(f"{line}\n") for line in list_input]
             f.close()
     except Exception as e:
-        log.critical(f"[-] Unable to create {filename}: {e}")
+        log.critical(f"[-] Unable to write {filename}: {e}")
 
 
 def ssrf_permutations(scheme, ip_string, allowed_hostname, port=""):
@@ -411,7 +411,7 @@ def filename_generator(prefix, extension):
     Returns:
         str: timestamped filename string
     """
-    return f"{prefix}-{str(datetime.datetime.now().strftime('%H-%M-%d-%m-%Y'))}.{extension}"
+    return f"{prefix}-{str(datetime.datetime.now().strftime('%H%M%d%m%Y'))}.{extension}"
 
 
 if __name__ == "__main__":
@@ -426,9 +426,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "-a",
         "--allowed_host",
-        help="Allow-listed/valid domain/IPv4 address used for redirection/SSRF bypasses",
+        help="Allow-listed/valid domain/IPv4 address used for generating redirection/SSRF bypasses",
         action="store",
-        required="True",
+        default=""
     )
     parser.add_argument(
         "-p",
@@ -446,13 +446,13 @@ if __name__ == "__main__":
     parser.add_argument(
         "-cP",
         "--cloud_payloads",
-        help="Output common cloud service payloads unrelated to IPv4 input (from cloud_pay",
+        help="Output common cloud service payloads unrelated to IPv4 input (from cloud-payloads.txt)",
         action="store_true",
     )
     parser.add_argument(
-        "-nB",
-        "--no_bypasses",
-        help="Print IPv4 notation variants only; do not include SSRF bypass permutations",
+        "-nO",
+        "--no_output",
+        help="Do not write payload outputs to file",
         action="store_true",
     )
 
@@ -492,15 +492,18 @@ if __name__ == "__main__":
             CLOUD_PAYLOADS_LIST = lines_to_list("cloud-payloads.txt")
             OUTPUT_LIST = OUTPUT_LIST + CLOUD_PAYLOADS_LIST
         output_filename = filename_generator(ipv4, "txt")
-        if args.no_bypasses:
+        if not args.allowed_host:
             if scheme_inputted:
                 PERMUTATIONS_LIST = [f"{scheme}{permutation}" for permutation in PERMUTATIONS_LIST]
             PERMUTATIONS_LIST = PERMUTATIONS_LIST + SCHEMES_LIST + CLOUD_PAYLOADS_LIST
             [print(f"{item}") for item in PERMUTATIONS_LIST]
-            write_list_to_file(output_filename, PERMUTATIONS_LIST)
+            if not args.no_output:
+                write_list_to_file(output_filename, PERMUTATIONS_LIST)
+                log.info(f"\n[+] Payloads written to {output_filename}")  
         else:
             [print(f"{item}") for item in OUTPUT_LIST]
-            write_list_to_file(output_filename, OUTPUT_LIST)
-        log.info(f"\n[+] Payloads written to {output_filename}")  
+            if not args.no_output:
+                write_list_to_file(output_filename, OUTPUT_LIST)
+                log.info(f"\n[+] Payloads written to {output_filename}")  
     except Exception as e:
         log.critical(f"[-] Failed to complete SSRF payload generation with the following error: {e}")
