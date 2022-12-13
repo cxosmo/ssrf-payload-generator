@@ -15,3 +15,7 @@ Basic usage is as follows:
 
 # Thanks
 Huge thanks to cujanovic for their [excellent SSRF-Testing repository](https://github.com/cujanovic/SSRF-Testing); this tool builds upon the [ip.py](https://github.com/cujanovic/SSRF-Testing/blob/master/ip.py) script and other references from that repo.
+
+# References
+- [RFC 3986: Rare IP Address Formats](https://tools.ietf.org/html/rfc3986#section-7.4)
+- [Application Security Cheat Sheet - Server Side Request Forgery](https://0xn3va.gitbook.io/cheat-sheets/web-application/server-side-request-forgery#rare-ip-address)
